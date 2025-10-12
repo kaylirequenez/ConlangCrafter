@@ -9,7 +9,7 @@ We introduce a fully automated system for constructing languages (conlangs) usin
 
 ### Supported Models
 
-- **Google Gemini**: gemini-2.5-pro, gemini-1.5-flash
+- **Google Gemini**: gemini-2.5-pro, gemini-2.5-flash
 - **DeepSeek**: DeepSeek-R1 (via Together API)
 
 ### Quick Start
