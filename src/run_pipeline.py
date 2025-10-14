@@ -91,6 +91,8 @@ def get_args():
                        help='Maximum tokens for generation')
     parser.add_argument('--temperature', type=float, default=0.7,
                        help='Temperature for sampling')
+    parser.add_argument('--thinking-budget', type=int, default=1000,
+                       help='Thinking budget for models that support it')
     parser.add_argument('--sleep-between-calls', type=float, default=30,
                        help='Sleep time between API calls (seconds)')
     
@@ -173,7 +175,8 @@ def main():
             max_tokens=args.max_tokens,
             temperature=args.temperature,
             sleep_between_calls=args.sleep_between_calls,
-            debug=args.debug
+            debug=args.debug,
+            thinking_budget=args.thinking_budget
         )
     elif args.model.startswith('deepseek'):
         llm_client = LLMClientDeepseek(
