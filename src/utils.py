@@ -87,3 +87,43 @@ def save_memory(content: str, memory_dir: str, filename: str, metadata: dict):
         json.dump(metadata, f, indent=2, ensure_ascii=False)
     
     logger.info(f"Saved {filename} and metadata to {memory_dir}")
+
+
+# === Additional helper utilities for QA-enabled pipeline ===
+
+def load_files_with_optional(memory_dir: str, required_files: dict, optional_files: dict) -> dict:
+    """Load required files plus optional files if they exist.
+
+    Returns a dict containing all loaded file contents, or None if a required file is missing.
+    """
+    files = load_required_files(memory_dir, required_files)
+    if files is None:
+        return None
+    for key, filename in optional_files.items():
+        path = os.path.join(memory_dir, key, filename)
+        if os.path.exists(path):
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    files[key] = f.read()
+                logger.info(f"Loaded optional {key}: {path}")
+            except Exception as e:
+                logger.warning(f"Failed loading optional {key} ({path}): {e}")
+    return files
+
+
+def save_memory_without_metadata(content: str, memory_dir: str, filename: str):
+    """Save content file only (do not create/modify metadata.json)."""
+    os.makedirs(memory_dir, exist_ok=True)
+    path = os.path.join(memory_dir, filename)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    logger.info(f"Saved {filename} (no metadata) to {memory_dir}")
+
+
+def save_individual_metadata(metadata: dict, memory_dir: str, filename: str):
+    """Save a standalone metadata JSON (used for per-item outputs like individual translations)."""
+    os.makedirs(memory_dir, exist_ok=True)
+    path = os.path.join(memory_dir, filename)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+    logger.info(f"Saved individual metadata {filename} to {memory_dir}")

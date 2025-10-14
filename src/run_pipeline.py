@@ -103,6 +103,24 @@ def get_args():
                        help='Reasoning effort for OpenAI o-series')
     parser.add_argument('--sleep-between-calls', type=float, default=30,
                        help='Sleep time between API calls (seconds)')
+
+    # QA settings
+    parser.add_argument('--qa-enabled', action='store_true',
+                        help='Enable QA self-refine (critic/amend) loop for supported steps')
+    parser.add_argument('--self-refine-steps', type=int, default=3,
+                        help='Number of QA self-refine (critic/amend) cycles')
+    parser.add_argument('--qa-threshold', type=float, default=None,
+                        help='Global passing score threshold (1–10 scale) overriding all per-step thresholds if set')
+    parser.add_argument('--qa-threshold-phonology', type=float, default=8.0,
+                        help='Passing score threshold (1–10 scale) for phonology QA')
+    parser.add_argument('--qa-threshold-grammar', type=float, default=8.0,
+                        help='Passing score threshold (1–10 scale) for grammar QA')
+    parser.add_argument('--qa-threshold-lexicon', type=float, default=8.0,
+                        help='Passing score threshold (1–10 scale) for lexicon QA')
+    parser.add_argument('--qa-threshold-translation', type=float, default=8.0,
+                        help='Passing score threshold (1–10 scale) for translation QA')
+    parser.add_argument('--continue-qa', action='store_true',
+                        help='If a QA report exists, continue from previous iterations and append results')
     
     # Pipeline settings
     parser.add_argument('--steps', default='phonology,grammar,lexicon,translation',

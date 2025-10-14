@@ -94,6 +94,40 @@ You'll need API keys for the language models:
 
 Add these to your `.env` file (copy from `.env.example`).
 
+### Self-Refinement (Critic / Amend Loop)
+
+Enable an optional QA loop that critiques and amends intermediate artifacts (phonology, grammar, lexicon, translation).
+
+Scoring scale used by prompts:
+- 10: Completely consistent / excellent
+- 9: Consistent, only clarity or minor style ambiguities
+- 8: Very minor issues (default acceptance threshold)
+- 7: Some moderate issues – needs revision
+- 6 or below: Significant inconsistencies or errors
+
+Run with QA enabled (global threshold & custom self-refine cycles):
+```bash
+python src/run_pipeline.py --model gemini-2.5-pro \
+   --qa-enabled \
+   --self-refine-steps 4 \
+   --qa-threshold 8
+```
+
+Flags:
+- --qa-enabled: activate QA self-refine loop.
+- --self-refine-steps: number of critic→amend cycles (default 3).
+- --qa-threshold: global acceptance threshold (1–10 scale) overriding per-step thresholds when set.
+- --qa-threshold-<step>: per-step acceptance threshold (default 8.0) used only if --qa-threshold not supplied.
+- --continue-qa: append new QA iterations onto existing <step>_qa.json.
+
+Each QA cycle:
+1. Critic prompt returns JSON: overall_score (1–10) + issues list.
+2. If score < threshold and cycles remain, amend prompt applies corrections.
+3. Loop stops early if threshold met; otherwise after self-refine budget exhausted.
+4. Iterations logged in <step>_qa.json (before/after snapshots + iteration metadata).
+
+Note: A score of 9 typically indicates only clarity/ambiguity issues; 8 allows very minor contradictions. Adjust thresholds if you want stricter acceptance
+
 ## Citation
 
 If you use ConlangCrafter in your research, please cite:
