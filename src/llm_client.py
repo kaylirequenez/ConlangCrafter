@@ -14,7 +14,7 @@ class LLMClientGemini:
     def __init__(self, 
                  model_checkpoint: str = 'gemini-2.5-pro',
                  max_tokens: int = 32768,
-                 thinking_budget: int = 0,
+                 thinking_budget: int = 1000,
                  temperature: float = 0.6,
                  top_p: float = 0.95,
                  sleep_between_calls: float = 60,
