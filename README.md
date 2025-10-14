@@ -9,8 +9,11 @@ We introduce a fully automated system for constructing languages (conlangs) usin
 
 ### Supported Models
 
-- **Google Gemini**: gemini-2.5-pro, gemini-2.5-flash
-- **DeepSeek**: DeepSeek-R1 (via Together API)
+You can pass any valid model string for the provider you choose:
+
+- Google Gemini (e.g., gemini-2.5-pro, gemini-1.5-flash)
+- OpenAI (e.g., o4-mini, gpt-4o, gpt-5, gpt-4.1-mini)
+- DeepSeek via Together (e.g., deepseek-ai/DeepSeek-R1)
 
 ### Quick Start
 
@@ -29,6 +32,21 @@ We introduce a fully automated system for constructing languages (conlangs) usin
    ```bash
    python src/run_pipeline.py --model gemini-2.5-pro
    ```
+
+   Or with OpenAI models (choose the model you prefer):
+   ```bash
+   # Reasoning model (o-series)
+   python src/run_pipeline.py --model o4-mini --reasoning-effort medium
+
+   # GPT-family examples
+   python src/run_pipeline.py --model gpt-4o
+   python src/run_pipeline.py --model gpt-5
+   python src/run_pipeline.py --model gpt-4.1-mini
+   ```
+
+Notes for OpenAI:
+- o-series (o1/o3/o4) reasoning models ignore temperature/top_p; use `--reasoning-effort`.
+- GPT-family models (e.g., gpt-4o) respect temperature/top_p.
 
 ### Directory Structure
 
@@ -60,12 +78,19 @@ python src/run_pipeline.py \
     --translation-sentence "Hello, world!"
 ```
 
+#### Model-specific parameter guide
+
+- reasoning-effort: Applies to OpenAI o-series reasoning models only (o1, o3, o4, including o4-mini). Ignored by GPT-family models like gpt-4o and gpt-5.
+- thinking-budget: Applies to Google Gemini models that support thinking output. Supported: gemini-2.5-pro. Not supported/ignored: gemini-1.5-flash and OpenAI models in this project.
+- DeepSeek: DeepSeek-R1 automatically emits a <think> section; thinking-budget isn’t used here. Use temperature/top_p as usual.
+
 ### API Keys
 
 You'll need API keys for the language models:
 
-- **Google Gemini**: Get from [Google AI Studio](https://aistudio.google.com/app/apikey)
-- **DeepSeek**: Get from [Together AI](https://api.together.xyz/settings/api-keys)
+- **Google Gemini**: Get from [Google AI Studio](https://aistudio.google.com/app/apikey) → set `GOOGLE_API_KEY`
+- **OpenAI**: Get from [OpenAI API Keys](https://platform.openai.com/api-keys) → set `OPENAI_API_KEY`
+- **DeepSeek (via Together)**: Get from [Together AI](https://api.together.xyz/settings/api-keys) → set `TOGETHER_API_KEY`
 
 Add these to your `.env` file (copy from `.env.example`).
 

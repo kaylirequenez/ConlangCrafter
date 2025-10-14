@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-from llm_client import LLMClientGemini, LLMClientDeepseek
+from llm_client import LLMClientGemini, LLMClientDeepseek, LLMClientOpenAI
 from pipeline_steps import run_phonology_step, run_grammar_step, run_lexicon_step, run_translation_step
 
 logger = logging.getLogger(__name__)
@@ -84,15 +84,23 @@ def get_args():
     parser = ArgumentParser(description='Generate constructed languages using AI')
     
     # Model settings
-    parser.add_argument('--model', default='gemini-2.5-pro', 
-                       choices=['gemini-2.5-pro', 'gemini-1.5-flash', 'deepseek-r1'],
-                       help='AI model to use')
+    parser.add_argument(
+        '--model',
+        default='gemini-2.5-pro',
+        help=(
+            'Model identifier to use. Examples: gemini-2.5-pro, gemini-1.5-flash, '
+            'o4-mini, gpt-4o, gpt-5, deepseek-ai/DeepSeek-R1. '
+            'Any valid provider model string is accepted.'
+        ),
+    )
     parser.add_argument('--max-tokens', type=int, default=8192,
                        help='Maximum tokens for generation')
     parser.add_argument('--temperature', type=float, default=0.7,
                        help='Temperature for sampling')
     parser.add_argument('--thinking-budget', type=int, default=1000,
                        help='Thinking budget for models that support it')
+    parser.add_argument('--reasoning-effort', default='medium', choices=['low','medium','high'],
+                       help='Reasoning effort for OpenAI o-series')
     parser.add_argument('--sleep-between-calls', type=float, default=30,
                        help='Sleep time between API calls (seconds)')
     
@@ -180,8 +188,18 @@ def main():
         )
     elif args.model.startswith('deepseek'):
         llm_client = LLMClientDeepseek(
-            model_checkpoint='deepseek-ai/DeepSeek-R1',
+            model_checkpoint=args.model,
             max_tokens=args.max_tokens,
+            temperature=args.temperature,
+            sleep_between_calls=args.sleep_between_calls,
+            debug=args.debug
+        )
+    elif args.model.startswith('o') or args.model.startswith('gpt-'):
+        # OpenAI client supports both o-series reasoning models and gpt-4o style
+        llm_client = LLMClientOpenAI(
+            model_checkpoint=args.model,
+            max_tokens=args.max_tokens,
+            reasoning_effort=args.reasoning_effort,
             temperature=args.temperature,
             sleep_between_calls=args.sleep_between_calls,
             debug=args.debug
