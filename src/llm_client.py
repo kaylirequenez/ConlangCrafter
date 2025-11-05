@@ -71,6 +71,11 @@ class LLMClientGemini:
             config=self.generation_config
         )
         
+        # DEBUG
+        if not response.candidates or not response.candidates[0].content:
+            logger.error("Model returned no candidates or empty content")
+            return ""
+        
         thought = None
         response_text = None
         for part in response.candidates[0].content.parts:
@@ -84,6 +89,16 @@ class LLMClientGemini:
         
         self._last_thought = thought
         
+        # DEBUG
+        if response_text is None:
+            if thought:
+                logger.warning("Model returned only thought content; using thought as response_text.")
+                response_text = thought
+            else:
+                logger.error("Model returned no textual content at all; using empty string.")
+                response_text = ""
+
+        
         if do_sleep and self.sleep_between_calls > 0:
             logger.info(f"Sleeping for: {self.sleep_between_calls}s")
             sleep(self.sleep_between_calls)
@@ -94,6 +109,10 @@ class LLMClientGemini:
         """Generate a response and return both full response and extracted content."""
         response = self.generate(prompt, do_sleep, **kwargs)
         thought = self._last_thought or ""
+        
+        # DEBUG
+        if response is None:
+            response = ""
         
         if self.debug:
             full_response = response
