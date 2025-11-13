@@ -122,7 +122,7 @@ def run_analysis_step(args, llm_client):
     analysis_dir = os.path.join(args.memory_dir, 'analysis')
     os.makedirs(analysis_dir, exist_ok=True)
     
-    with open(os.path.join(analysis_dir, 'analysis.txt'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(analysis_dir, 'features.txt'), 'w', encoding='utf-8') as f:
         f.write(analysis)
     
     logger.info("Final analysis completed and saved")
